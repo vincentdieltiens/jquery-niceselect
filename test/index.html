@@ -10,7 +10,8 @@
     	$(document).ready(function(){
     		$('#select1_styled').niceselect();
     		
-    		$('#select1_styled li[value=3]').attr('selected', true);
+    		$('#select1_original option[value="3"]').attr('selected', true);
+    		$('#select1_styled option[value="3"]').attr('selected', true).trigger('change');
     	});
     	
     </script>
