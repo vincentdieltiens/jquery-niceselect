@@ -43,10 +43,15 @@
 				return false;
 			});
 			
-			$select.change(function(){
+			$select.bind('change', function(){
+				
 				$choices_ul.children('.selected').removeClass('selected');
 				
-				var $selectedItem = $(this).chilren('')
+				var $selectedItem = $(this).children(':selected');
+				
+				$choices_ul.children('[rel='+$selectedItem.attr('value')+']').addClass('selected');
+				
+				$label_div.children('span').html($selectedItem.html());
 			});
 			
 			$choices_ul.children('li').click(function(){
