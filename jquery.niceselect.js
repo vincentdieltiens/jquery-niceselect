@@ -16,7 +16,7 @@
 			
 			
 			
-			var $label_div = $('<button />').addClass(options.labelClass).html('<span>'+$itemSelected+'</span>');
+			var $label_div = $('<div />').addClass(options.labelClass).html('<span>'+$itemSelected+'</span>');
 			
 			$select.before($label_div);
 			
@@ -39,7 +39,7 @@
 			});
 			
 			$label_div.click(function(){
-				$label_div.children('ul').toggle();
+				$(this).children('ul').toggle();
 				return false;
 			});
 			
