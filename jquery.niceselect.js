@@ -11,8 +11,9 @@
 			}
 			
 			var $select = $(this);
+			new Select($select, options);
 			
-			var $itemSelected = $select.children(':selected').html();
+			/*var $itemSelected = $select.children(':selected').html();
 			
 			
 			
@@ -69,8 +70,64 @@
 			
 			$(window).bind('click', function(){
 				$label_div.children('ul').hide();
-			});
+			});*/
 		});
+	};
+	
+	function Select($select, options) {
+	  this.$select = $select;
+	  this.options = options;
+	  this.$fakeSelect = $('<div />');
+	  
+	  this.init();
+	}
+	
+	Select.prototype = {
+	  init: function() {
+	    var self = this;
+	    
+	    var $selectedItem = this.selectedItem();
+	    
+	    this.$fakeSelect
+	      .html('<span>'+$selectedItem.html()+'</span>')
+	      .addClass(this.options.labelClass);
+	      
+	    this.$fakeSelect.css({
+	      'position': 'absolute',
+	      'left': this.$select.position().left,
+	      'top': this.$select.position().top,
+	      'min-width': this.$select.width(),
+	      'min-height': this.$select.height()
+	    });
+	    
+	    var $choices_ul = $('<ul />').addClass(this.options.optionsClass);
+			this.$select.children().each(function(){
+				var $option = $(this);
+				var $li = $('<li />').attr('rel', $option.attr('value')).html($option.html());
+				
+				if( $option.attr('selected') ) {
+					$li.addClass('selected');
+				}
+				
+				$choices_ul.append($li);
+			});
+			$choices_ul.hide();
+      
+	    this.$select.after(this.$fakeSelect);
+	    this.$fakeSelect.after($choices_ul);
+	  },
+	  select: function() {
+	    
+	  },
+	  selectedItem: function() {
+	    return this.$select.children(':selected');
+	  },
+	  val: function() {
+	    return this.selectedItem().val();
+	  },
+	  label: function() {
+	    return this.selectedItem().html();
+	  }
 	};
 	
 	$.fn.niceselect.defaults = {
