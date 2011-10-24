@@ -120,7 +120,7 @@
       });
       
       // Hide the options
-      this.hideOptions();
+      this.$fakeSelectOptions.hide();
       
       // Add the fake select in the page
       this.$select.after(this.$fakeSelect);
@@ -133,6 +133,13 @@
       });
       
       this.$select.width(this.$fakeSelect.width());
+      this.$select.height(this.$fakeSelect.height()-2);
+      this.$select.css({
+      	'border': '0px',
+      	'margin': '0px',
+      	'padding': '0px',
+      	'visibility': 'hidden'
+      });
       
       // Update the position and size of the list of options
       this.$fakeSelect.css({
@@ -154,49 +161,50 @@
       
       // Handler to display the list of options when clicking on the list
       this.$fakeSelect.click(function(){
-        
-        $('#'+$(this).attr('id')+'_options').show();
-        
-        // Close the list of options when escape is down
-        $(window).keydown(function(e){
-          if( e.keyCode == 27 ) { // ESC
-            $('#'+self.$fakeSelect.attr('id')+'_options').hide();
-          }
-        });
-        
-        $(window).bind('mousedown', self.hideOptions);
-        
+        self.toggleOptions();
         return false;
       });
       
+      // Close the list of options when escape is down
+      $(window).keydown(function(e){
+        if( e.keyCode == 27 ) { // ESC
+          self.hideOptions();
+        }
+      });
+      
       // Handler to update the fake select when the real is updated
-      this.$select.change(function() {
+      this.$select.change(function(e) {
         var val = $(this).val();
         var label = $(this).children(':selected').html();
         self.$fakeSelect.children('span').html(label);
-        
         self.$fakeSelectOptions.find('.selected').removeClass('selected');
-        self.$fakeSelectOptions.find('[rel='+val+']').addClass('selected');
+        self.$fakeSelectOptions.find('[rel="'+val+'"]').addClass('selected');
+        e.preventDefault();
+        return false;
       });
       
       // Handler to update the real select when the user choose an item
       // in the list of options
-      this.$fakeSelectOptions.children('li').click(function(){
-        
-        $(this).parent('ul').hide();
-        
+      this.$fakeSelectOptions.children('li').click(function(e){
+        self.hideOptions();
         self.$select.val($(this).attr('rel'));
         self.$select.trigger('change');
+        e.preventDefault();
+        e.stopImmediatePropagation();
       });
       
       this.$fakeSelect.keydown(function(e){
         
         if( e.keyCode == 32 ) { // space bar
-          $('#'+$(this).attr('id')+'_options').show();
+            self.toggleOptions();
         }
       });
       
-      
+      $(document).click(function(e) {
+        if( e.target != self.$fakeSelectOptions.get(0) ) {
+          self.hideOptions();
+        }
+      });
     },
     select: function() {
       
@@ -211,18 +219,39 @@
       return this.selectedItem().html();
     },
     hideOptions: function() {
-      $(window).unbind('mousedown', this.hideOptions);
-
-      this.$fakeSelectOptions.hide();
+      //$(window).unbind('mousedown', this.hideOptions);
+      if( typeof this.options.hideOptions == 'function' ) {
+        this.options.hideOptions(this.$fakeSelectOptions);
+      } else {
+        this.$fakeSelectOptions.hide();
+      }
     },
     showOptions: function() {
-      this.$fakeSelectOptions.show();
+      if( typeof this.options.showOptions == 'function' ) {
+        this.options.showOptions(this.$fakeSelectOptions);
+      } else {
+        this.$fakeSelectOptions.show();
+      }
+    },
+    toggleOptions: function() {
+      if( this.$fakeSelectOptions.css('display') == 'none' ) {
+        this.showOptions();
+      } else {
+        this.hideOptions();
+      }
+      
     }
   };
   
   $.fn.niceselect.defaults = {
     labelClass: 'niceselect_label',
-    optionsClass: 'niceselect_options'
+    optionsClass: 'niceselect_options',
+    hideOptions: function($options) {
+      $options.fadeOut();
+    },
+    showOptions: function($options) {
+      $options.fadeIn();
+    }
   };
 
 })(jQuery);
